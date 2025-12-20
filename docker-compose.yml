@@ -1,21 +1,30 @@
-version: '3.8'
+version: '3.9'
+
 services:
-  postgres:
-    image: postgres:15
+  spring_boot_postgresql_crud:
+    container_name: spring_boot_postgresql_crud
+    image: ps49/spring_boot_postgresql_crud
+    build: .
+    ports:
+      - 7090:7090
     environment:
-      POSTGRES_DB: productdb
+      - DATABASE_URL=jdbc:postgresql://java_db:5432/productdb
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=pappu123
+    depends_on:
+      - java_db
+      
+  java_db:
+    container_name: java_db
+    image: postgres:15
+    ports:
+      - 5432:5432
+    environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: pappu123
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: productdb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
-  springapp:
-    build: .
-    depends_on:
-      - postgres
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/productdb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: pappu123
-    ports:
-      - "7090:7090"
+volumes:
+  pgdata: {}
